@@ -235,8 +235,8 @@ initialize_database() {
     log_info "Initializing database..."
     cd "$APP_DIR"
 
-    # Run as the app user
-    sudo -u "$APP_USER" bash -c "
+    # Run as the app user (use su instead of sudo - sudo not available in minimal containers)
+    su -s /bin/bash "$APP_USER" -c "
         source venv/bin/activate
         export DATABASE_URL='sqlite:///$APP_DIR/data/database.db'
         python import_data.py
