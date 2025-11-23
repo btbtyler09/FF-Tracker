@@ -385,84 +385,91 @@ def initialize_app():
     print("-" * 60)
     
     # Use file locking to prevent race conditions with multiple workers
-    # Try /app/data first, fall back to /tmp if permission issues
-    lock_file_path = '/app/data/init.lock'
+    # Derive data directory from DATABASE_URL, fall back to /tmp if issues
     lock_file = None
-    
+
+    # Get data directory from database URL
+    db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if 'sqlite:///' in db_url:
+        db_path = db_url.replace('sqlite:///', '')
+        data_dir = os.path.dirname(db_path)
+    else:
+        data_dir = '/tmp'
+
+    lock_file_path = os.path.join(data_dir, 'init.lock') if data_dir else '/tmp/init.lock'
+
     try:
-        # Try to ensure data directory exists for lock file (may fail on local dev)
-        try:
-            os.makedirs('/app/data', exist_ok=True)
-        except (PermissionError, OSError):
-            pass  # Directory creation failed, will use fallback
-        
-        # Try to open lock file in /app/data
-        try:
-            lock_file = open(lock_file_path, 'w')
-        except PermissionError:
-            # Fall back to /tmp which is always writable
-            print(f"Permission denied for {lock_file_path}, using /tmp/init.lock instead")
-            lock_file_path = '/tmp/init.lock'
-            lock_file = open(lock_file_path, 'w')
-        
+        # Try to ensure data directory exists for lock file
+        if data_dir:
+            os.makedirs(data_dir, exist_ok=True)
+
+        # Try to open lock file in data directory
+        lock_file = open(lock_file_path, 'w')
+    except (PermissionError, FileNotFoundError, OSError) as e:
+        # Fall back to /tmp which is always writable
+        print(f"Cannot use {lock_file_path} ({e}), using /tmp/init.lock instead")
+        lock_file_path = '/tmp/init.lock'
+        lock_file = open(lock_file_path, 'w')
+
+    try:
         # Try to acquire exclusive lock (will block if another process has it)
         print("Acquiring initialization lock...")
         fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
         print("Lock acquired, proceeding with initialization")
-        
+
         # Small delay to ensure any other process commits
         time.sleep(0.1)
-        
+
         with app.app_context():
             try:
                 # Create tables
                 print("Step 1: Creating database tables...")
                 db.create_all()
                 print("✅ Database tables created successfully")
-                
-                # Check if database needs initialization  
+
+                # Check if database needs initialization
                 # Re-check after acquiring lock in case another worker already initialized
                 from models import Manager, Team, seed_database
                 manager_count = Manager.query.count()
                 print(f"Found {manager_count} existing managers in database")
-                
+
                 if manager_count == 0:
                     print("")
                     print("🔄 Empty database detected - initializing with data...")
-                    
+
                     # Import managers
                     print("  → Creating managers...")
                     seed_database()
                     print("  ✅ Managers created successfully")
-                    
+
                     # Import teams and draft data
                     try:
                         from import_data import import_teams_data, import_draft_data
-                        
+
                         print("  → Importing teams data...")
                         if import_teams_data():
                             print("  ✅ Teams data imported successfully")
                         else:
                             print("  ❌ Warning: Teams data import failed")
-                        
+
                         print("  → Importing draft data...")
                         if import_draft_data():
-                            print("  ✅ Draft data imported successfully") 
+                            print("  ✅ Draft data imported successfully")
                         else:
                             print("  ❌ Warning: Draft data import failed")
-                            
+
                     except Exception as e:
                         print(f"  ❌ Warning: Data import failed: {e}")
                 else:
                     print("✅ Database already initialized with data")
-                
+
                 # Show final database status
                 manager_count = Manager.query.count()
                 team_count = Team.query.count()
                 print(f"Database status: {manager_count} managers, {team_count} teams")
-                
+
                 print("-" * 60)
-                
+
                 # Perform automatic update on startup (skip in debug mode)
                 debug_mode = os.environ.get('DEBUG', 'False').lower() == 'true'
                 if not debug_mode:
@@ -470,20 +477,20 @@ def initialize_app():
                     try:
                         update_game_results()
                         print("✅ Game data update completed")
-                        
+
                         # Vegas line updates disabled - using projections directly
                         # print("🎲 Running Vegas line updates...")
                         # from vegas_updater import update_vegas_lines
                         # vegas_result = update_vegas_lines()
                         # print(f"✅ Vegas lines updated: {vegas_result['updated']} teams")
-                        
+
                         print("✅ Startup data update completed successfully")
                     except Exception as e:
                         print(f"❌ Warning: Startup data update failed: {e}")
                         # Don't crash the app if update fails
                 else:
                     print("⏭️  Skipping startup update (debug mode)")
-                
+
                 # Initialize background scheduler for automatic updates
                 print("🔄 Initializing background scheduler...")
                 try:
@@ -492,12 +499,12 @@ def initialize_app():
                 except Exception as e:
                     print(f"⚠️  Warning: Scheduler initialization failed: {e}")
                     # Don't crash the app if scheduler fails
-                
+
                 print("=" * 60)
                 print("🚀 APPLICATION READY - Database initialization complete!")
                 print("=" * 60)
                 print("")
-                    
+
             except Exception as e:
                 print("=" * 60)
                 print(f"💥 CRITICAL ERROR during app initialization: {e}")
