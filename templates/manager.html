@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}{{ manager.name }} - 2025 Fantasy Football League{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="manager-header">
+        <h2>{{ manager.name }}</h2>
+        <div class="manager-info">
+            <span class="draft-position">Draft Position: {{ manager.draft_position }}</span>
+        </div>
+    </div>
+    <div class="header-actions">
+        <a href="/" class="btn btn-secondary">
+            <span class="btn-icon">←</span>
+            Back to Standings
+        </a>
+    </div>
+</div>
+
+{% if not teams %}
+<div class="empty-state">
+    <div class="empty-icon">📋</div>
+    <h3>No Teams Drafted</h3>
+    <p>This manager hasn't drafted any teams yet.</p>
+</div>
+{% else %}
+
+<div class="manager-summary">
+    <div class="summary-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ teams|length }}</div>
+            <div class="stat-label">Teams Drafted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ teams|selectattr('team.league', 'equalto', 'COLLEGE')|list|length }}</div>
+            <div class="stat-label">College Teams</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ teams|selectattr('team.league', 'equalto', 'NFL')|list|length }}</div>
+            <div class="stat-label">NFL Teams</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ teams|map(attribute='wins')|sum }}</div>
+            <div class="stat-label">Total Wins</div>
+        </div>
+    </div>
+</div>
+
+<div class="teams-section">
+    <h3>Draft Picks & Performance</h3>
+    
+    <div class="teams-grid">
+        {% for team_info in teams %}
+        <div class="team-detail-card">
+            <div class="team-card-header">
+                <div class="team-main-info">
+                    <h4 class="team-name">{{ team_info.team.name }}</h4>
+                    <span class="team-league {{ team_info.team.league.lower() }}">
+                        {{ team_info.team.league }}
+                    </span>
+                </div>
+                <div class="draft-info">
+                    <span class="draft-round">Round {{ team_info.pick.round }}</span>
+                    <span class="draft-pick">Pick {{ team_info.pick.pick }}</span>
+                </div>
+            </div>
+            
+            <div class="team-card-body">
+                {% if team_info.team.conference %}
+                <div class="team-conference">{{ team_info.team.conference }}</div>
+                {% endif %}
+                
+                <div class="team-performance">
+                    <div class="performance-stat">
+                        <span class="stat-label">Regular Season Wins:</span>
+                        <span class="stat-value">{{ team_info.wins }}</span>
+                    </div>
+                    
+                    {% if team_info.team.vegas_total %}
+                    <div class="performance-stat">
+                        <span class="stat-label">Vegas O/U:</span>
+                        <span class="stat-value">{{ team_info.team.vegas_total }}</span>
+                        {% if team_info.wins > team_info.team.vegas_total %}
+                        <span class="vegas-status over">📈 OVER</span>
+                        {% elif team_info.wins < team_info.team.vegas_total %}
+                        <span class="vegas-status under">📉 Under</span>
+                        {% else %}
+                        <span class="vegas-status push">➡️ Push</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="performance-stat">
+                        <span class="stat-label">Total Points:</span>
+                        <span class="stat-value points-highlight">{{ team_info.wins }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if team_info.team.games %}
+            <div class="team-card-footer">
+                <details class="recent-games">
+                    <summary>Recent Games ({{ team_info.team.games|length }})</summary>
+                    <div class="games-list">
+                        {% for game in team_info.team.games|reverse %}
+                        <div class="game-result {{ 'win' if game.won else 'loss' }}">
+                            <span class="game-opponent">vs {{ game.opponent }}</span>
+                            <span class="game-result-text">{{ 'W' if game.won else 'L' }}</span>
+                            {% if game.score_us is not none and game.score_them is not none %}
+                            <span class="game-score">{{ game.score_us }}-{{ game.score_them }}</span>
+                            {% endif %}
+                            {% if game.week %}
+                            <span class="game-week">Week {{ game.week }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </details>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="draft-summary">
+    <h3>Draft Summary</h3>
+    <div class="draft-table-wrapper">
+        <table class="draft-table">
+            <thead>
+                <tr>
+                    <th>Round</th>
+                    <th>Pick</th>
+                    <th>Team</th>
+                    <th>League</th>
+                    <th>Conference</th>
+                    <th>Current Record</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team_info in teams|sort(attribute='pick.pick') %}
+                <tr>
+                    <td>{{ team_info.pick.round }}</td>
+                    <td>{{ team_info.pick.pick }}</td>
+                    <td><strong>{{ team_info.team.name }}</strong></td>
+                    <td>
+                        <span class="league-badge {{ team_info.team.league.lower() }}">
+                            {{ team_info.team.league }}
+                        </span>
+                    </td>
+                    <td>{{ team_info.team.conference or 'N/A' }}</td>
+                    <td>
+                        <span class="record">{{ team_info.wins }}-{{ team_info.team.games|length - team_info.wins }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}

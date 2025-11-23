@@ -1,0 +1,40 @@
+# Fantasy Football Score Update Cron Schedule
+# Copy these lines to your crontab with: crontab -e
+# 
+# IMPORTANT: Update the path /home/tyler/FF-Tracker to your actual installation path
+# IMPORTANT: Adjust timezone-specific times based on your server's timezone
+
+# Set environment variables for cron
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Update after college football games (Saturday nights at 11 PM)
+0 23 * * 6 cd /home/tyler/FF-Tracker && python3 update_scores.py >> logs/cron_updates.log 2>&1
+
+# Update after Sunday NFL games (Sunday nights at 11 PM) 
+0 23 * * 0 cd /home/tyler/FF-Tracker && python3 update_scores.py >> logs/cron_updates.log 2>&1
+
+# Update after Monday Night Football (Tuesday mornings at 2 AM)
+0 2 * * 2 cd /home/tyler/FF-Tracker && python3 update_scores.py >> logs/cron_updates.log 2>&1
+
+# Weekly catch-all update (Wednesday mornings at 8 AM with verbose logging)
+0 8 * * 3 cd /home/tyler/FF-Tracker && python3 update_scores.py --verbose >> logs/cron_updates.log 2>&1
+
+# Optional: Log rotation to prevent log files from growing too large
+# This runs monthly and keeps last 3 months of logs
+0 0 1 * * find /home/tyler/FF-Tracker/logs -name "*.log" -type f -mtime +90 -delete
+
+# Alternative schedule for more frequent updates during active game days:
+# Every 3 hours on Saturday (college games)
+# 0 */3 * * 6 cd /home/tyler/FF-Tracker && python3 update_scores.py >> logs/cron_updates.log 2>&1
+
+# Every 2 hours on Sunday (NFL games)  
+# 0 */2 * * 0 cd /home/tyler/FF-Tracker && python3 update_scores.py >> logs/cron_updates.log 2>&1
+
+# To install this cron schedule:
+# 1. Edit the paths above to match your installation
+# 2. Copy the cron lines (not the comments) to your crontab:
+#    crontab -e
+# 3. Paste the cron lines and save
+# 4. Verify with: crontab -l
+# 5. Check logs with: tail -f /home/tyler/FF-Tracker/logs/cron_updates.log

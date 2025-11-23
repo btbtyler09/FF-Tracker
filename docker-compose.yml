@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  fantasy-tracker:
+    build: .
+    ports:
+      - "8742:8742"
+    environment:
+      - SECRET_KEY=your-production-secret-key-change-this
+      - DEBUG=False
+      - DATABASE_URL=sqlite:////app/data/database.db
+      - UPDATE_INTERVAL=300
+      - LEAGUE_NAME=Gentlemen's Club Fantasy Football League
+      - SEASON_YEAR=2025
+    volumes:
+      - ff_tracker_data:/app/data
+      - ff_tracker_logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8742/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  ff_tracker_data:
+  ff_tracker_logs:

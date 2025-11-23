@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Standings - 2025 Fantasy Football League{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Current Standings</h2>
+    <div class="header-stats">
+        <span class="stat">8 Managers</span>
+        <span class="stat">Season: 2025</span>
+    </div>
+</div>
+
+{% if not standings %}
+<div class="empty-state">
+    <div class="empty-icon">🏈</div>
+    <h3>No Standings Yet</h3>
+    <p>The season hasn't started or no game data has been loaded.</p>
+</div>
+{% else %}
+
+<div class="standings-container">
+    <div class="standings-table-wrapper">
+        <table class="standings-table">
+            <thead>
+                <tr>
+                    <th class="rank-col">Rank</th>
+                    <th class="manager-col">Manager</th>
+                    <th class="points-col">Points</th>
+                    <th class="projection-col">Projection</th>
+                    <th class="expand-col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for standing in standings %}
+                <tr class="standing-row {% if loop.index <= 3 %}top-{{ loop.index }}{% endif %}" data-manager-id="{{ standing.manager_id }}">
+                    <td class="rank">
+                        <div class="rank-badge rank-{{ loop.index }}">{{ loop.index }}</div>
+                    </td>
+                    <td class="manager">
+                        <div class="manager-link" onclick="toggleTeamDetailsByManager({{ standing.manager_id }})">
+                            <strong>{{ standing.manager_name }}</strong>
+                            <small class="draft-pos">{{ standing.manager_record }}</small>
+                        </div>
+                    </td>
+                    <td class="total-points">
+                        <div class="points-display">{{ standing.total_points }}</div>
+                        <div class="points-bonus">{{ standing.total_bonus }} bonus</div>
+                    </td>
+                    <td class="projection-points">
+                        <div class="projected-display">{{ "%.1f"|format(standing.projected_total) }}</div>
+                        <div class="projection-preseason">Preseason: {{ "%.1f"|format(standing.preseason_projection) }}</div>
+                    </td>
+                    <td class="expand-toggle">
+                        <button class="expand-btn" onclick="toggleTeamDetails(this)" aria-label="Expand team details">
+                            <span class="expand-icon">▼</span>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="team-details-row" data-manager-id="{{ standing.manager_id }}" style="display: none;">
+                    <td colspan="5" class="team-details-container">
+                        <div class="team-grid">
+                            <!-- College Teams Section -->
+                            {% set college_teams = standing.teams|selectattr('league', 'equalto', 'COLLEGE')|list %}
+                            {% if college_teams %}
+                            <div class="league-section">
+                                <h4 class="league-header">College Teams</h4>
+                                <div class="league-teams">
+                                    {% for team in college_teams %}
+                                    <div class="team-card">
+                                        <div class="team-header">
+                                            <span class="team-name">{{ team.team_name }} <span class="team-record">({{ team.record }})</span></span>
+                                            <span class="team-league {{ team.league.lower() }}">{{ team.league }}</span>
+                                        </div>
+                                        <div class="team-stats">
+                                            <div class="point-breakdown">
+                                                <span class="stat-wins">{{ team.regular_wins }}W</span>
+                                                <span class="stat-separator">|</span>
+                                                <span class="stat-bonus">{{ team.postseason_points + team.vegas_bonus }} Bonus</span>
+                                                <span class="stat-separator">|</span>
+                                                <span class="stat-total">{{ team.total_points }} Total Pts</span>
+                                            </div>
+                                        </div>
+                                        <div class="vegas-lines">
+                                            {% if team.original_vegas_line or team.vegas_line_used %}
+                                            <div class="vegas-progression">
+                                                <span class="vegas-label">O/U:</span>
+                                                {% if team.vegas_line_used and team.original_vegas_line and team.vegas_line_used != team.original_vegas_line %}
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                <span class="vegas-arrow">→</span>
+                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
+                                                {% elif team.vegas_line_used %}
+                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
+                                                {% elif team.original_vegas_line %}
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <!-- NFL Teams Section -->
+                            {% set nfl_teams = standing.teams|selectattr('league', 'equalto', 'NFL')|list %}
+                            {% if nfl_teams %}
+                            <div class="league-section">
+                                <h4 class="league-header">NFL Teams</h4>
+                                <div class="league-teams">
+                                    {% for team in nfl_teams %}
+                                    <div class="team-card">
+                                        <div class="team-header">
+                                            <span class="team-name">{{ team.team_name }} <span class="team-record">({{ team.record }})</span></span>
+                                            <span class="team-league {{ team.league.lower() }}">{{ team.league }}</span>
+                                        </div>
+                                        <div class="team-stats">
+                                            <div class="point-breakdown">
+                                                <span class="stat-wins">{{ team.regular_wins }}W</span>
+                                                <span class="stat-separator">|</span>
+                                                <span class="stat-bonus">{{ team.postseason_points + team.vegas_bonus }} Bonus</span>
+                                                <span class="stat-separator">|</span>
+                                                <span class="stat-total">{{ team.total_points }} Total Pts</span>
+                                            </div>
+                                        </div>
+                                        <div class="vegas-lines">
+                                            {% if team.original_vegas_line or team.vegas_line_used %}
+                                            <div class="vegas-progression">
+                                                <span class="vegas-label">O/U:</span>
+                                                {% if team.vegas_line_used and team.original_vegas_line and team.vegas_line_used != team.original_vegas_line %}
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                <span class="vegas-arrow">→</span>
+                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
+                                                {% elif team.vegas_line_used %}
+                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
+                                                {% elif team.original_vegas_line %}
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endif %}
+{% endblock %}

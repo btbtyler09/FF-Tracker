@@ -1,0 +1,24 @@
+[Unit]
+Description=FF-Tracker Fantasy Football League Tracker
+After=network.target
+
+[Service]
+Type=simple
+User=ff-tracker
+Group=ff-tracker
+WorkingDirectory=/opt/ff-tracker
+Environment="PATH=/opt/ff-tracker/venv/bin"
+EnvironmentFile=/opt/ff-tracker/.env
+ExecStart=/opt/ff-tracker/venv/bin/gunicorn --bind 0.0.0.0:8742 --workers 2 --timeout 120 --keep-alive 2 app:app
+Restart=always
+RestartSec=10
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/ff-tracker/data /opt/ff-tracker/logs
+
+[Install]
+WantedBy=multi-user.target

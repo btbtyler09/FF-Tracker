@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}2025 Fantasy Football League{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏈</text></svg>">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="nav-title">🏈 2025 Fantasy League</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Standings</a>
+                <a href="/rules" class="nav-link {% if request.endpoint == 'rules' %}active{% endif %}">Rules</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% if error %}
+        <div class="alert alert-error">
+            <span class="alert-icon">⚠️</span>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Fantasy Football League | Commissioner: Andrew Lloyd</p>
+            <div class="update-info">
+                Scores update automatically after games complete
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

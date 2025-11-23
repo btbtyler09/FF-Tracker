@@ -1,0 +1,646 @@
+{
+  "college_teams": {
+    "Notre Dame": {
+      "full_name": "Notre Dame Fighting Irish",
+      "abbreviation": "ND",
+      "conference": "Independent",
+      "division": null,
+      "espn_id": "87",
+      "vegas_total": 10.5
+    },
+    "Ohio State": {
+      "full_name": "Ohio State Buckeyes",
+      "abbreviation": "OSU",
+      "conference": "Big Ten",
+      "division": "East",
+      "espn_id": "194",
+      "vegas_total": 10.5
+    },
+    "Oregon": {
+      "full_name": "Oregon Ducks",
+      "abbreviation": "ORE",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "2483",
+      "vegas_total": 10.5
+    },
+    "Penn State": {
+      "full_name": "Penn State Nittany Lions",
+      "abbreviation": "PSU",
+      "conference": "Big Ten",
+      "division": "East",
+      "espn_id": "213",
+      "vegas_total": 10.5
+    },
+    "Alabama": {
+      "full_name": "Alabama Crimson Tide",
+      "abbreviation": "ALA",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "333",
+      "vegas_total": 9.5
+    },
+    "Clemson": {
+      "full_name": "Clemson Tigers",
+      "abbreviation": "CLEM",
+      "conference": "ACC",
+      "division": "Atlantic",
+      "espn_id": "228",
+      "vegas_total": 9.5
+    },
+    "Georgia": {
+      "full_name": "Georgia Bulldogs",
+      "abbreviation": "UGA",
+      "conference": "SEC",
+      "division": "East",
+      "espn_id": "61",
+      "vegas_total": 9.5
+    },
+    "Miami (FL)": {
+      "full_name": "Miami Hurricanes",
+      "abbreviation": "MIA",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "2390",
+      "vegas_total": 9.5
+    },
+    "Texas": {
+      "full_name": "Texas Longhorns",
+      "abbreviation": "TEX",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "251",
+      "vegas_total": 9.5
+    },
+    "Arizona State": {
+      "full_name": "Arizona State Sun Devils",
+      "abbreviation": "ASU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "9",
+      "vegas_total": 8.5
+    },
+    "Indiana": {
+      "full_name": "Indiana Hoosiers",
+      "abbreviation": "IND",
+      "conference": "Big Ten",
+      "division": "East",
+      "espn_id": "84",
+      "vegas_total": 8.5
+    },
+    "Kansas State": {
+      "full_name": "Kansas State Wildcats",
+      "abbreviation": "KSU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "2306",
+      "vegas_total": 8.5
+    },
+    "Louisville": {
+      "full_name": "Louisville Cardinals",
+      "abbreviation": "LOU",
+      "conference": "ACC",
+      "division": "Atlantic",
+      "espn_id": "97",
+      "vegas_total": 8.5
+    },
+    "LSU": {
+      "full_name": "LSU Tigers",
+      "abbreviation": "LSU",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "99",
+      "vegas_total": 8.5
+    },
+    "Michigan": {
+      "full_name": "Michigan Wolverines",
+      "abbreviation": "MICH",
+      "conference": "Big Ten",
+      "division": "East",
+      "espn_id": "130",
+      "vegas_total": 8.5
+    },
+    "Ole Miss": {
+      "full_name": "Ole Miss Rebels",
+      "abbreviation": "OM",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "145",
+      "vegas_total": 8.5
+    },
+    "SMU": {
+      "full_name": "SMU Mustangs",
+      "abbreviation": "SMU",
+      "conference": "ACC",
+      "division": "Atlantic",
+      "espn_id": "2567",
+      "vegas_total": 8.5
+    },
+    "Tennessee": {
+      "full_name": "Tennessee Volunteers",
+      "abbreviation": "TENN",
+      "conference": "SEC",
+      "division": "East",
+      "espn_id": "2633",
+      "vegas_total": 8.5
+    },
+    "Texas Tech": {
+      "full_name": "Texas Tech Red Raiders",
+      "abbreviation": "TTU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "2641",
+      "vegas_total": 8.5
+    },
+    "Auburn": {
+      "full_name": "Auburn Tigers",
+      "abbreviation": "AUB",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "2",
+      "vegas_total": 7.5
+    },
+    "Baylor": {
+      "full_name": "Baylor Bears",
+      "abbreviation": "BAY",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "239",
+      "vegas_total": 7.5
+    },
+    "Florida": {
+      "full_name": "Florida Gators",
+      "abbreviation": "FLA",
+      "conference": "SEC",
+      "division": "East",
+      "espn_id": "57",
+      "vegas_total": 7.5
+    },
+    "Florida State": {
+      "full_name": "Florida State Seminoles",
+      "abbreviation": "FSU",
+      "conference": "ACC",
+      "division": "Atlantic",
+      "espn_id": "52",
+      "vegas_total": 7.5
+    },
+    "Georgia Tech": {
+      "full_name": "Georgia Tech Yellow Jackets",
+      "abbreviation": "GT",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "59",
+      "vegas_total": 7.5
+    },
+    "Illinois": {
+      "full_name": "Illinois Fighting Illini",
+      "abbreviation": "ILL",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "356",
+      "vegas_total": 7.5
+    },
+    "Iowa": {
+      "full_name": "Iowa Hawkeyes",
+      "abbreviation": "IOWA",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "2294",
+      "vegas_total": 7.5
+    },
+    "Iowa State": {
+      "full_name": "Iowa State Cyclones",
+      "abbreviation": "ISU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "66",
+      "vegas_total": 7.5
+    },
+    "Kansas": {
+      "full_name": "Kansas Jayhawks",
+      "abbreviation": "KAN",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "2305",
+      "vegas_total": 7.5
+    },
+    "Missouri": {
+      "full_name": "Missouri Tigers",
+      "abbreviation": "MIZ",
+      "conference": "SEC",
+      "division": "East",
+      "espn_id": "142",
+      "vegas_total": 7.5
+    },
+    "Nebraska": {
+      "full_name": "Nebraska Cornhuskers",
+      "abbreviation": "NEB",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "158",
+      "vegas_total": 7.5
+    },
+    "North Carolina": {
+      "full_name": "North Carolina Tar Heels",
+      "abbreviation": "UNC",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "153",
+      "vegas_total": 7.5
+    },
+    "South Carolina": {
+      "full_name": "South Carolina Gamecocks",
+      "abbreviation": "SC",
+      "conference": "SEC",
+      "division": "East",
+      "espn_id": "2579",
+      "vegas_total": 7.5
+    },
+    "Texas A&M": {
+      "full_name": "Texas A&M Aggies",
+      "abbreviation": "TAMU",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "245",
+      "vegas_total": 7.5
+    },
+    "Utah": {
+      "full_name": "Utah Utes",
+      "abbreviation": "UTAH",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "254",
+      "vegas_total": 7.5
+    },
+    "USC": {
+      "full_name": "USC Trojans",
+      "abbreviation": "USC",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "30",
+      "vegas_total": 7.5
+    },
+    "Washington": {
+      "full_name": "Washington Huskies",
+      "abbreviation": "WASH",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "264",
+      "vegas_total": 7.5
+    },
+    "BYU": {
+      "full_name": "BYU Cougars",
+      "abbreviation": "BYU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "252",
+      "vegas_total": 6.5
+    },
+    "Colorado": {
+      "full_name": "Colorado Buffaloes",
+      "abbreviation": "COL",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "38",
+      "vegas_total": 6.5
+    },
+    "Duke": {
+      "full_name": "Duke Blue Devils",
+      "abbreviation": "DUKE",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "150",
+      "vegas_total": 6.5
+    },
+    "Houston": {
+      "full_name": "Houston Cougars",
+      "abbreviation": "HOU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "248",
+      "vegas_total": 6.5
+    },
+    "Minnesota": {
+      "full_name": "Minnesota Golden Gophers",
+      "abbreviation": "MINN",
+      "conference": "Big Ten",
+      "division": "West",
+      "espn_id": "135",
+      "vegas_total": 6.5
+    },
+    "NC State": {
+      "full_name": "NC State Wolfpack",
+      "abbreviation": "NCST",
+      "conference": "ACC",
+      "division": "Atlantic",
+      "espn_id": "152",
+      "vegas_total": 6.5
+    },
+    "Oklahoma": {
+      "full_name": "Oklahoma Sooners",
+      "abbreviation": "OU",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "201",
+      "vegas_total": 6.5
+    },
+    "TCU": {
+      "full_name": "TCU Horned Frogs",
+      "abbreviation": "TCU",
+      "conference": "Big 12",
+      "division": null,
+      "espn_id": "2628",
+      "vegas_total": 6.5
+    },
+    "Virginia": {
+      "full_name": "Virginia Cavaliers",
+      "abbreviation": "UVA",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "258",
+      "vegas_total": 6.5
+    },
+    "Virginia Tech": {
+      "full_name": "Virginia Tech Hokies",
+      "abbreviation": "VT",
+      "conference": "ACC",
+      "division": "Coastal",
+      "espn_id": "259",
+      "vegas_total": 6.5
+    },
+    "Arkansas": {
+      "full_name": "Arkansas Razorbacks",
+      "abbreviation": "ARK",
+      "conference": "SEC",
+      "division": "West",
+      "espn_id": "8",
+      "vegas_total": 5.5
+    },
+    "Michigan State": {
+      "full_name": "Michigan State Spartans",
+      "abbreviation": "MSU",
+      "conference": "Big Ten",
+      "division": "East",
+      "espn_id": "127",
+      "vegas_total": 5.5
+    }
+  },
+  "nfl_teams": {
+    "Philadelphia Eagles": {
+      "full_name": "Philadelphia Eagles",
+      "abbreviation": "PHI",
+      "conference": "NFC",
+      "division": "East",
+      "espn_id": "21",
+      "vegas_total": 11.5
+    },
+    "Baltimore Ravens": {
+      "full_name": "Baltimore Ravens",
+      "abbreviation": "BAL",
+      "conference": "AFC",
+      "division": "North",
+      "espn_id": "33",
+      "vegas_total": 11.5
+    },
+    "Buffalo Bills": {
+      "full_name": "Buffalo Bills",
+      "abbreviation": "BUF",
+      "conference": "AFC",
+      "division": "East",
+      "espn_id": "2",
+      "vegas_total": 11.5
+    },
+    "Kansas City Chiefs": {
+      "full_name": "Kansas City Chiefs",
+      "abbreviation": "KC",
+      "conference": "AFC",
+      "division": "West",
+      "espn_id": "12",
+      "vegas_total": 11.5
+    },
+    "Detroit Lions": {
+      "full_name": "Detroit Lions",
+      "abbreviation": "DET",
+      "conference": "NFC",
+      "division": "North",
+      "espn_id": "8",
+      "vegas_total": 10.5
+    },
+    "San Francisco 49ers": {
+      "full_name": "San Francisco 49ers",
+      "abbreviation": "SF",
+      "conference": "NFC",
+      "division": "West",
+      "espn_id": "25",
+      "vegas_total": 10.5
+    },
+    "Washington Commanders": {
+      "full_name": "Washington Commanders",
+      "abbreviation": "WAS",
+      "conference": "NFC",
+      "division": "East",
+      "espn_id": "28",
+      "vegas_total": 9.5
+    },
+    "Cincinnati Bengals": {
+      "full_name": "Cincinnati Bengals",
+      "abbreviation": "CIN",
+      "conference": "AFC",
+      "division": "North",
+      "espn_id": "4",
+      "vegas_total": 9.5
+    },
+    "Los Angeles Rams": {
+      "full_name": "Los Angeles Rams",
+      "abbreviation": "LAR",
+      "conference": "NFC",
+      "division": "West",
+      "espn_id": "14",
+      "vegas_total": 9.5
+    },
+    "Green Bay Packers": {
+      "full_name": "Green Bay Packers",
+      "abbreviation": "GB",
+      "conference": "NFC",
+      "division": "North",
+      "espn_id": "9",
+      "vegas_total": 9.5
+    },
+    "Los Angeles Chargers": {
+      "full_name": "Los Angeles Chargers",
+      "abbreviation": "LAC",
+      "conference": "AFC",
+      "division": "West",
+      "espn_id": "24",
+      "vegas_total": 9.5
+    },
+    "Houston Texans": {
+      "full_name": "Houston Texans",
+      "abbreviation": "HOU",
+      "conference": "AFC",
+      "division": "South",
+      "espn_id": "34",
+      "vegas_total": 9.5
+    },
+    "Denver Broncos": {
+      "full_name": "Denver Broncos",
+      "abbreviation": "DEN",
+      "conference": "AFC",
+      "division": "West",
+      "espn_id": "7",
+      "vegas_total": 9.5
+    },
+    "Tampa Bay Buccaneers": {
+      "full_name": "Tampa Bay Buccaneers",
+      "abbreviation": "TB",
+      "conference": "NFC",
+      "division": "South",
+      "espn_id": "27",
+      "vegas_total": 9.5
+    },
+    "Minnesota Vikings": {
+      "full_name": "Minnesota Vikings",
+      "abbreviation": "MIN",
+      "conference": "NFC",
+      "division": "North",
+      "espn_id": "16",
+      "vegas_total": 8.5
+    },
+    "Chicago Bears": {
+      "full_name": "Chicago Bears",
+      "abbreviation": "CHI",
+      "conference": "NFC",
+      "division": "North",
+      "espn_id": "3",
+      "vegas_total": 8.5
+    },
+    "Pittsburgh Steelers": {
+      "full_name": "Pittsburgh Steelers",
+      "abbreviation": "PIT",
+      "conference": "AFC",
+      "division": "North",
+      "espn_id": "23",
+      "vegas_total": 8.5
+    },
+    "Arizona Cardinals": {
+      "full_name": "Arizona Cardinals",
+      "abbreviation": "ARI",
+      "conference": "NFC",
+      "division": "West",
+      "espn_id": "22",
+      "vegas_total": 8.5
+    },
+    "Seattle Seahawks": {
+      "full_name": "Seattle Seahawks",
+      "abbreviation": "SEA",
+      "conference": "NFC",
+      "division": "West",
+      "espn_id": "26",
+      "vegas_total": 8.5
+    },
+    "New England Patriots": {
+      "full_name": "New England Patriots",
+      "abbreviation": "NE",
+      "conference": "AFC",
+      "division": "East",
+      "espn_id": "17",
+      "vegas_total": 8.5
+    },
+    "Miami Dolphins": {
+      "full_name": "Miami Dolphins",
+      "abbreviation": "MIA",
+      "conference": "AFC",
+      "division": "East",
+      "espn_id": "15",
+      "vegas_total": 8.5
+    },
+    "Dallas Cowboys": {
+      "full_name": "Dallas Cowboys",
+      "abbreviation": "DAL",
+      "conference": "NFC",
+      "division": "East",
+      "espn_id": "6",
+      "vegas_total": 7.5
+    },
+    "Atlanta Falcons": {
+      "full_name": "Atlanta Falcons",
+      "abbreviation": "ATL",
+      "conference": "NFC",
+      "division": "South",
+      "espn_id": "1",
+      "vegas_total": 7.5
+    },
+    "Jacksonville Jaguars": {
+      "full_name": "Jacksonville Jaguars",
+      "abbreviation": "JAX",
+      "conference": "AFC",
+      "division": "South",
+      "espn_id": "30",
+      "vegas_total": 7.5
+    },
+    "Indianapolis Colts": {
+      "full_name": "Indianapolis Colts",
+      "abbreviation": "IND",
+      "conference": "AFC",
+      "division": "South",
+      "espn_id": "11",
+      "vegas_total": 7.5
+    },
+    "Las Vegas Raiders": {
+      "full_name": "Las Vegas Raiders",
+      "abbreviation": "LV",
+      "conference": "AFC",
+      "division": "West",
+      "espn_id": "13",
+      "vegas_total": 6.5
+    },
+    "Carolina Panthers": {
+      "full_name": "Carolina Panthers",
+      "abbreviation": "CAR",
+      "conference": "NFC",
+      "division": "South",
+      "espn_id": "29",
+      "vegas_total": 6.5
+    },
+    "New York Jets": {
+      "full_name": "New York Jets",
+      "abbreviation": "NYJ",
+      "conference": "AFC",
+      "division": "East",
+      "espn_id": "20",
+      "vegas_total": 5.5
+    },
+    "New York Giants": {
+      "full_name": "New York Giants",
+      "abbreviation": "NYG",
+      "conference": "NFC",
+      "division": "East",
+      "espn_id": "19",
+      "vegas_total": 5.5
+    },
+    "Tennessee Titans": {
+      "full_name": "Tennessee Titans",
+      "abbreviation": "TEN",
+      "conference": "AFC",
+      "division": "South",
+      "espn_id": "10",
+      "vegas_total": 5.5
+    },
+    "New Orleans Saints": {
+      "full_name": "New Orleans Saints",
+      "abbreviation": "NO",
+      "conference": "NFC",
+      "division": "South",
+      "espn_id": "18",
+      "vegas_total": 5.5
+    },
+    "Cleveland Browns": {
+      "full_name": "Cleveland Browns",
+      "abbreviation": "CLE",
+      "conference": "AFC",
+      "division": "North",
+      "espn_id": "5",
+      "vegas_total": 4.5
+    }
+  }
+}

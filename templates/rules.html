@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Scoring Rules - 2025 Fantasy Football League{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>League Scoring Rules</h2>
+    <div class="header-stats">
+        <span class="stat">2025 Season</span>
+        <span class="stat">8 Managers</span>
+    </div>
+</div>
+
+<div class="rules-container">
+    <!-- Overview Section -->
+    <div class="rules-section">
+        <h3>🏈 League Overview</h3>
+        <div class="rule-content">
+            <p><strong>Format:</strong> Snake Draft Fantasy Football League</p>
+            <p><strong>Teams:</strong> Each manager drafts 10 teams total (6 College, 4 NFL)</p>
+            <p><strong>Objective:</strong> Accumulate the most points based on team performance throughout the season</p>
+            <p><strong>Season:</strong> College and NFL regular season + postseason play</p>
+        </div>
+    </div>
+
+    <!-- Scoring Rules Section -->
+    <div class="rules-section">
+        <h3>📊 Point Scoring System</h3>
+        <div class="rules-grid">
+            <div class="rule">
+                <span class="rule-icon">🏆</span>
+                <div class="rule-details">
+                    <strong>Regular Season Wins</strong>
+                    <p>+1 point per win during regular season</p>
+                    <small>Applies to both college and NFL teams</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">🎯</span>
+                <div class="rule-details">
+                    <strong>Conference Championship</strong>
+                    <p>+1 point for winning conference championship</p>
+                    <small>College teams only (SEC, Big Ten, etc.)</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">🏈</span>
+                <div class="rule-details">
+                    <strong>Bowl Game Wins</strong>
+                    <p>+1 point per bowl game victory</p>
+                    <small>College teams only (includes CFP games)</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">🏆</span>
+                <div class="rule-details">
+                    <strong>Playoff Participation</strong>
+                    <p>+1 point for making playoffs</p>
+                    <small>College CFP or NFL playoffs</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">⭐</span>
+                <div class="rule-details">
+                    <strong>Playoff Wins</strong>
+                    <p>+1 point per playoff victory</p>
+                    <small>Additional points beyond playoff participation</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">👑</span>
+                <div class="rule-details">
+                    <strong>Championship Victory</strong>
+                    <p>+1 point for winning championship</p>
+                    <small>College National Championship or Super Bowl</small>
+                </div>
+            </div>
+            <div class="rule">
+                <span class="rule-icon">📈</span>
+                <div class="rule-details">
+                    <strong>Vegas Over/Under Bonus</strong>
+                    <p>+1 point for exceeding preseason win total</p>
+                    <small>Based on original Vegas projection at draft time</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draft Rules Section -->
+    <div class="rules-section">
+        <h3>🎯 Draft Rules</h3>
+        <div class="rule-content">
+            <p><strong>Draft Format:</strong> Snake Draft (8 rounds, alternating direction)</p>
+            <p><strong>Team Pool:</strong></p>
+            <ul>
+                <li><strong>College:</strong> Top Power 5 conference teams + selected Group of 5 teams</li>
+                <li><strong>NFL:</strong> All 32 NFL teams available</li>
+            </ul>
+            <p><strong>Draft Requirements:</strong></p>
+            <ul>
+                <li>6 College teams per manager (75 total college picks)</li>
+                <li>4 NFL teams per manager (32 total NFL picks)</li>
+                <li>No duplicate teams across managers</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tiebreaker Rules Section -->
+    <div class="rules-section">
+        <h3>⚖️ Tiebreaker Procedures</h3>
+        <div class="rule-content">
+            <p>In case of tied total points, tiebreakers are applied in this order:</p>
+            <ol>
+                <li><strong>Postseason Points:</strong> Manager with more postseason points wins</li>
+                <li><strong>Regular Season Wins:</strong> Manager with more regular season wins wins</li>
+                <li><strong>Coin Flip:</strong> Coin flip conducted by Commissioner on video</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- League Administration -->
+    <div class="rules-section">
+        <h3>👥 League Administration</h3>
+        <div class="rule-content">
+            <p><strong>Commissioner:</strong> Andrew Lloyd</p>
+            <p><strong>Scoring Updates:</strong> Automatic updates after games complete</p>
+            <p><strong>Season Timeline:</strong> Late August through February</p>
+            <p><strong>Buy In:</strong> $100 per team</p>
+            <p><strong>Prize Structure:</strong> 1st Place: $500, 2nd Place: $200, 3rd Place: $100</p>
+        </div>
+    </div>
+
+    <!-- Back to Standings -->
+    <div class="rules-section">
+        <div class="back-link">
+            <a href="/" class="btn btn-primary">
+                <span class="btn-icon">📊</span>
+                Back to Standings
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.rules-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.rules-section {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-xl);
+}
+
+.rules-section h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.rule-content {
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.rule-content p {
+    margin-bottom: var(--spacing-md);
+}
+
+.rule-content ul, .rule-content ol {
+    margin-left: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+}
+
+.rule-content li {
+    margin-bottom: var(--spacing-sm);
+}
+
+.rules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.rule {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.rule-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.rule-details strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.rule-details p {
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-dark);
+}
+
+.rule-details small {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .rules-container {
+        margin: 0;
+    }
+    
+    .rules-section {
+        margin-bottom: var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+    
+    .rules-section h3 {
+        font-size: 1.25rem;
+    }
+    
+    .rules-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .rule {
+        padding: var(--spacing-sm);
+    }
+    
+    .rule-icon {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+{% endblock %}

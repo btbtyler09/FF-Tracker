@@ -1,0 +1,499 @@
+#!/bin/bash
+#
+# FF-Tracker Installation Script
+# Installs the Fantasy Football Tracker on Debian/Ubuntu LXC containers
+#
+# Usage:
+#   curl -sSL https://raw.githubusercontent.com/YOUR_USER/FF-Tracker/main/install.sh | bash
+#   or
+#   git clone https://github.com/YOUR_USER/FF-Tracker.git && cd FF-Tracker && sudo ./install.sh
+#
+
+set -e
+
+# Configuration
+APP_NAME="ff-tracker"
+APP_DIR="/opt/ff-tracker"
+APP_USER="ff-tracker"
+APP_GROUP="ff-tracker"
+APP_PORT="8742"
+REPO_URL="https://github.com/btbtyler09/FF-Tracker.git"
+PYTHON_VERSION="python3"
+SERVICE_FILE="/etc/systemd/system/ff-tracker.service"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Check if running as root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        log_error "This script must be run as root (use sudo)"
+        exit 1
+    fi
+}
+
+# Detect OS
+detect_os() {
+    if [[ -f /etc/os-release ]]; then
+        . /etc/os-release
+        OS=$ID
+        VERSION=$VERSION_ID
+    else
+        log_error "Cannot detect operating system"
+        exit 1
+    fi
+
+    case $OS in
+        debian|ubuntu)
+            log_info "Detected $PRETTY_NAME"
+            ;;
+        *)
+            log_error "Unsupported operating system: $OS"
+            log_error "This script supports Debian and Ubuntu only"
+            exit 1
+            ;;
+    esac
+}
+
+# Install system dependencies
+install_dependencies() {
+    log_info "Updating package lists..."
+    apt-get update -qq
+
+    log_info "Installing system dependencies..."
+    apt-get install -y -qq \
+        python3 \
+        python3-pip \
+        python3-venv \
+        sqlite3 \
+        curl \
+        git \
+        > /dev/null
+
+    log_success "System dependencies installed"
+}
+
+# Create application user
+create_app_user() {
+    if id "$APP_USER" &>/dev/null; then
+        log_info "User '$APP_USER' already exists"
+    else
+        log_info "Creating application user '$APP_USER'..."
+        useradd --system --no-create-home --shell /usr/sbin/nologin "$APP_USER"
+        log_success "User '$APP_USER' created"
+    fi
+}
+
+# Clone or update repository
+setup_application() {
+    if [[ -d "$APP_DIR" ]]; then
+        log_warning "Directory $APP_DIR already exists"
+        read -p "Do you want to update the existing installation? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Updating existing installation..."
+            cd "$APP_DIR"
+
+            # Check if we're in a git repo
+            if [[ -d ".git" ]]; then
+                git pull origin main || git pull origin master || true
+            else
+                log_warning "Not a git repository, skipping update"
+            fi
+        else
+            log_info "Keeping existing installation"
+        fi
+    else
+        # Check if we're running from the repo directory (contains app.py)
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        if [[ -f "$SCRIPT_DIR/app.py" ]]; then
+            log_info "Installing from local directory..."
+            mkdir -p "$APP_DIR"
+            cp -r "$SCRIPT_DIR"/* "$APP_DIR/"
+            cp -r "$SCRIPT_DIR"/.* "$APP_DIR/" 2>/dev/null || true
+        else
+            log_info "Cloning repository..."
+            git clone "$REPO_URL" "$APP_DIR"
+        fi
+        log_success "Application files installed to $APP_DIR"
+    fi
+}
+
+# Setup Python virtual environment
+setup_virtualenv() {
+    log_info "Setting up Python virtual environment..."
+    cd "$APP_DIR"
+
+    if [[ ! -d "venv" ]]; then
+        $PYTHON_VERSION -m venv venv
+    fi
+
+    source venv/bin/activate
+
+    log_info "Installing Python dependencies..."
+    pip install --upgrade pip -q
+    pip install -r requirements.txt -q
+
+    deactivate
+    log_success "Python environment configured"
+}
+
+# Create data directories
+setup_directories() {
+    log_info "Creating data directories..."
+
+    mkdir -p "$APP_DIR/data"
+    mkdir -p "$APP_DIR/logs"
+
+    # Set ownership
+    chown -R "$APP_USER:$APP_GROUP" "$APP_DIR"
+    chmod -R 755 "$APP_DIR"
+    chmod 770 "$APP_DIR/data"
+    chmod 770 "$APP_DIR/logs"
+
+    log_success "Directories created and permissions set"
+}
+
+# Create environment file
+create_env_file() {
+    ENV_FILE="$APP_DIR/.env"
+
+    if [[ -f "$ENV_FILE" ]]; then
+        log_info "Environment file already exists, keeping existing configuration"
+        return
+    fi
+
+    log_info "Creating environment configuration..."
+
+    # Generate a random secret key
+    SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+    cat > "$ENV_FILE" << EOF
+# FF-Tracker Configuration
+# Generated by install.sh on $(date)
+
+# Flask Configuration
+SECRET_KEY=$SECRET_KEY
+DEBUG=False
+FLASK_ENV=production
+
+# Database (SQLite)
+DATABASE_URL=sqlite:///$APP_DIR/data/database.db
+
+# League Configuration
+LEAGUE_NAME=Gentlemen's Club Fantasy Football League
+SEASON_YEAR=2025
+
+# Update Configuration
+UPDATE_INTERVAL=900
+
+# Projection Settings
+PROJ_MIN_GAMES=3
+PROJ_MAX_WEIGHT=0.7
+PROJ_RAMP_GAMES=6
+PROJ_WEEK_COMPLETE=True
+PROJ_USE_LIVE_LINES=True
+PROJ_CONSERVATIVE=0.8
+PROJ_EARLY_DAMPING=0.5
+
+# Vegas Updater Settings
+VEGAS_UPDATE_FREQ=24
+VEGAS_REQUEST_DELAY=1.0
+VEGAS_MAX_RETRIES=3
+VEGAS_AUTO_UPDATE=False
+EOF
+
+    chown "$APP_USER:$APP_GROUP" "$ENV_FILE"
+    chmod 600 "$ENV_FILE"
+
+    log_success "Environment file created"
+}
+
+# Initialize database
+initialize_database() {
+    log_info "Initializing database..."
+    cd "$APP_DIR"
+
+    # Run as the app user
+    sudo -u "$APP_USER" bash -c "
+        source venv/bin/activate
+        export DATABASE_URL='sqlite:///$APP_DIR/data/database.db'
+        python import_data.py
+    "
+
+    log_success "Database initialized with seed data"
+}
+
+# Create systemd service
+create_service() {
+    log_info "Creating systemd service..."
+
+    cat > "$SERVICE_FILE" << EOF
+[Unit]
+Description=FF-Tracker Fantasy Football League Tracker
+After=network.target
+
+[Service]
+Type=simple
+User=$APP_USER
+Group=$APP_GROUP
+WorkingDirectory=$APP_DIR
+Environment="PATH=$APP_DIR/venv/bin"
+EnvironmentFile=$APP_DIR/.env
+ExecStart=$APP_DIR/venv/bin/gunicorn --bind 0.0.0.0:$APP_PORT --workers 2 --timeout 120 --keep-alive 2 app:app
+Restart=always
+RestartSec=10
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=$APP_DIR/data $APP_DIR/logs
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable ff-tracker.service
+    systemctl start ff-tracker.service
+
+    # Wait a moment for service to start
+    sleep 2
+
+    if systemctl is-active --quiet ff-tracker.service; then
+        log_success "FF-Tracker service started successfully"
+    else
+        log_error "Service failed to start. Check logs with: journalctl -u ff-tracker.service"
+        exit 1
+    fi
+}
+
+# Setup Cloudflare Tunnel
+setup_cloudflare() {
+    echo
+    log_info "Cloudflare Tunnel Setup"
+    echo "========================"
+    echo "Cloudflare Tunnel provides secure remote access to your FF-Tracker"
+    echo "without opening ports on your firewall."
+    echo
+    read -p "Would you like to set up Cloudflare Tunnel? (y/N): " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_info "Skipping Cloudflare Tunnel setup"
+        echo "You can set it up later by running: sudo $APP_DIR/setup-cloudflare.sh"
+        return
+    fi
+
+    echo
+    echo "To get your tunnel token:"
+    echo "1. Go to https://one.dash.cloudflare.com/"
+    echo "2. Navigate to Networks > Tunnels"
+    echo "3. Create a new tunnel or select an existing one"
+    echo "4. Copy the tunnel token (starts with 'eyJ...')"
+    echo
+    read -p "Enter your Cloudflare Tunnel token: " CF_TOKEN
+
+    if [[ -z "$CF_TOKEN" ]]; then
+        log_warning "No token provided, skipping Cloudflare setup"
+        return
+    fi
+
+    log_info "Installing cloudflared..."
+
+    # Add Cloudflare GPG key
+    mkdir -p --mode=0755 /usr/share/keyrings
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+    # Add Cloudflare apt repository
+    echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflared.list
+
+    # Install cloudflared
+    apt-get update -qq
+    apt-get install -y -qq cloudflared
+
+    log_info "Configuring Cloudflare Tunnel service..."
+
+    # Install the tunnel as a service
+    cloudflared service install "$CF_TOKEN"
+
+    # Enable and start the service
+    systemctl enable cloudflared
+    systemctl start cloudflared
+
+    if systemctl is-active --quiet cloudflared; then
+        log_success "Cloudflare Tunnel installed and running"
+        echo
+        echo "IMPORTANT: Configure your tunnel in the Cloudflare dashboard:"
+        echo "  - Add a public hostname pointing to http://localhost:$APP_PORT"
+    else
+        log_error "Cloudflare Tunnel failed to start"
+        log_error "Check logs with: journalctl -u cloudflared"
+    fi
+}
+
+# Create standalone Cloudflare setup script
+create_cloudflare_script() {
+    cat > "$APP_DIR/setup-cloudflare.sh" << 'CFEOF'
+#!/bin/bash
+# Standalone Cloudflare Tunnel Setup Script
+
+set -e
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${RED}[ERROR]${NC} This script must be run as root (use sudo)"
+    exit 1
+fi
+
+echo -e "${BLUE}[INFO]${NC} Cloudflare Tunnel Setup"
+echo "========================"
+echo
+echo "To get your tunnel token:"
+echo "1. Go to https://one.dash.cloudflare.com/"
+echo "2. Navigate to Networks > Tunnels"
+echo "3. Create a new tunnel or select an existing one"
+echo "4. Copy the tunnel token (starts with 'eyJ...')"
+echo
+read -p "Enter your Cloudflare Tunnel token: " CF_TOKEN
+
+if [[ -z "$CF_TOKEN" ]]; then
+    echo -e "${RED}[ERROR]${NC} No token provided"
+    exit 1
+fi
+
+echo -e "${BLUE}[INFO]${NC} Installing cloudflared..."
+
+# Add Cloudflare GPG key
+mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+# Add Cloudflare apt repository
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflared.list
+
+apt-get update -qq
+apt-get install -y -qq cloudflared
+
+echo -e "${BLUE}[INFO]${NC} Configuring Cloudflare Tunnel service..."
+
+# Stop existing service if running
+systemctl stop cloudflared 2>/dev/null || true
+
+# Install the tunnel as a service
+cloudflared service install "$CF_TOKEN"
+
+systemctl enable cloudflared
+systemctl start cloudflared
+
+if systemctl is-active --quiet cloudflared; then
+    echo -e "${GREEN}[SUCCESS]${NC} Cloudflare Tunnel installed and running"
+    echo
+    echo "IMPORTANT: Configure your tunnel in the Cloudflare dashboard:"
+    echo "  - Add a public hostname pointing to http://localhost:8742"
+else
+    echo -e "${RED}[ERROR]${NC} Cloudflare Tunnel failed to start"
+    echo "Check logs with: journalctl -u cloudflared"
+    exit 1
+fi
+CFEOF
+
+    chmod +x "$APP_DIR/setup-cloudflare.sh"
+}
+
+# Print final status
+print_status() {
+    echo
+    echo "=============================================="
+    echo -e "${GREEN}FF-Tracker Installation Complete!${NC}"
+    echo "=============================================="
+    echo
+    echo "Application Details:"
+    echo "  - Install directory: $APP_DIR"
+    echo "  - Running as user: $APP_USER"
+    echo "  - Port: $APP_PORT"
+    echo "  - Database: $APP_DIR/data/database.db"
+    echo "  - Logs: $APP_DIR/logs/"
+    echo
+    echo "Service Management:"
+    echo "  - Status:  sudo systemctl status ff-tracker"
+    echo "  - Start:   sudo systemctl start ff-tracker"
+    echo "  - Stop:    sudo systemctl stop ff-tracker"
+    echo "  - Restart: sudo systemctl restart ff-tracker"
+    echo "  - Logs:    sudo journalctl -u ff-tracker -f"
+    echo
+    echo "Access your FF-Tracker at:"
+    echo "  - Local: http://localhost:$APP_PORT"
+
+    # Get IP address
+    IP_ADDR=$(hostname -I | awk '{print $1}')
+    if [[ -n "$IP_ADDR" ]]; then
+        echo "  - Network: http://$IP_ADDR:$APP_PORT"
+    fi
+
+    if systemctl is-active --quiet cloudflared; then
+        echo "  - Cloudflare Tunnel: Configured (check your CF dashboard for URL)"
+    else
+        echo
+        echo "To set up Cloudflare Tunnel later:"
+        echo "  sudo $APP_DIR/setup-cloudflare.sh"
+    fi
+
+    echo
+    echo "Configuration file: $APP_DIR/.env"
+    echo "Edit this file to customize league settings, then restart the service."
+    echo
+}
+
+# Main installation flow
+main() {
+    echo
+    echo "=============================================="
+    echo "  FF-Tracker Installation Script"
+    echo "  Fantasy Football League Tracker"
+    echo "=============================================="
+    echo
+
+    check_root
+    detect_os
+    install_dependencies
+    create_app_user
+    setup_application
+    setup_virtualenv
+    setup_directories
+    create_env_file
+    initialize_database
+    create_service
+    create_cloudflare_script
+    setup_cloudflare
+    print_status
+}
+
+# Run main function
+main "$@"

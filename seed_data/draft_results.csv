@@ -1,0 +1,81 @@
+manager,team,league,conference,round,pick,vegas_total
+Cliff,Alabama,COLLEGE,SEC,1,1,9.5
+Petty,Texas,COLLEGE,SEC,1,2,9.5
+Andrew,Philadelphia Eagles,NFL,NFC,1,3,11.5
+Kyle,Kansas City Chiefs,NFL,AFC,1,4,11.5
+Chad,Buffalo Bills,NFL,AFC,1,5,11.5
+Shelby,Baltimore Ravens,NFL,AFC,1,6,11.5
+Levi,Detroit Lions,NFL,NFC,1,7,10.5
+TB,San Francisco 49ers,NFL,NFC,1,8,10.5
+TB,Penn State,COLLEGE,Big Ten,2,9,10.5
+Levi,Ohio State,COLLEGE,Big Ten,2,10,10.5
+Shelby,Georgia,COLLEGE,SEC,2,11,9.5
+Chad,Clemson,COLLEGE,ACC,2,12,9.5
+Kyle,Oregon,COLLEGE,Big Ten,2,13,10.5
+Andrew,Miami (FL),COLLEGE,ACC,2,14,9.5
+Petty,Green Bay Packers,NFL,NFC,2,15,9.5
+Cliff,Notre Dame,COLLEGE,Independent,2,16,10.5
+Cliff,Cincinnati Bengals,NFL,AFC,3,17,9.5
+Petty,LSU,COLLEGE,SEC,3,18,8.5
+Andrew,Washington Commanders,NFL,NFC,3,19,9.5
+Kyle,Los Angeles Rams,NFL,NFC,3,20,9.5
+Chad,Houston Texans,NFL,AFC,3,21,9.5
+Shelby,Tampa Bay Buccaneers,NFL,NFC,3,22,9.5
+Levi,Denver Broncos,NFL,AFC,3,23,9.5
+TB,Los Angeles Chargers,NFL,AFC,3,24,9.5
+TB,Arizona State,COLLEGE,Big 12,4,25,8.5
+Levi,Tennessee,COLLEGE,SEC,4,26,8.5
+Shelby,Michigan,COLLEGE,Big Ten,4,27,8.5
+Chad,Ole Miss,COLLEGE,SEC,4,28,8.5
+Kyle,Iowa State,COLLEGE,Big 12,4,29,7.5
+Andrew,Illinois,COLLEGE,Big Ten,4,30,7.5
+Petty,Minnesota Vikings,NFL,NFC,4,31,8.5
+Cliff,Arizona Cardinals,NFL,NFC,4,32,8.5
+Cliff,Texas Tech,COLLEGE,Big 12,5,33,8.5
+Petty,Louisville,COLLEGE,ACC,5,34,8.5
+Andrew,Indiana,COLLEGE,Big Ten,5,35,8.5
+Kyle,Missouri,COLLEGE,SEC,5,36,7.5
+Chad,Kansas State,COLLEGE,Big 12,5,37,8.5
+Shelby,SMU,COLLEGE,ACC,5,38,8.5
+Levi,USC,COLLEGE,Big Ten,5,39,7.5
+TB,Pittsburgh Steelers,NFL,AFC,5,40,8.5
+TB,Utah,COLLEGE,Big 12,6,41,7.5
+Levi,Miami Dolphins,NFL,AFC,6,42,8.5
+Shelby,Dallas Cowboys,NFL,NFC,6,43,7.5
+Chad,New England Patriots,NFL,AFC,6,44,8.5
+Kyle,Atlanta Falcons,NFL,NFC,6,45,7.5
+Andrew,Jacksonville Jaguars,NFL,AFC,6,46,7.5
+Petty,Chicago Bears,NFL,NFC,6,47,8.5
+Cliff,Georgia Tech,COLLEGE,ACC,6,48,7.5
+Cliff,South Carolina,COLLEGE,SEC,7,49,7.5
+Petty,North Carolina,COLLEGE,ACC,7,50,7.5
+Andrew,Florida,COLLEGE,SEC,7,51,7.5
+Kyle,Seattle Seahawks,NFL,NFC,7,52,8.5
+Chad,Nebraska,COLLEGE,Big Ten,7,53,7.5
+Shelby,Carolina Panthers,NFL,NFC,7,54,6.5
+Levi,Indianapolis Colts,NFL,AFC,7,55,7.5
+TB,Las Vegas Raiders,NFL,AFC,7,56,6.5
+TB,Texas A&M,COLLEGE,SEC,8,57,7.5
+Levi,Virginia Tech,COLLEGE,ACC,8,58,6.5
+Shelby,BYU,COLLEGE,Big 12,8,59,6.5
+Chad,Oklahoma,COLLEGE,SEC,8,60,6.5
+Kyle,Kansas,COLLEGE,Big 12,8,61,7.5
+Andrew,Iowa,COLLEGE,Big Ten,8,62,7.5
+Petty,Baylor,COLLEGE,Big 12,8,63,7.5
+Cliff,New York Jets,NFL,AFC,8,64,5.5
+Cliff,Tennessee Titans,NFL,AFC,9,65,5.5
+Petty,Washington,COLLEGE,Big Ten,9,66,7.5
+Andrew,Florida State,COLLEGE,ACC,9,67,7.5
+Kyle,Duke,COLLEGE,ACC,9,68,6.5
+Chad,TCU,COLLEGE,Big 12,9,69,6.5
+Shelby,Minnesota,COLLEGE,Big Ten,9,70,6.5
+Levi,Virginia,COLLEGE,ACC,9,71,6.5
+TB,Arkansas,COLLEGE,SEC,9,72,5.5
+TB,Houston,COLLEGE,Big 12,10,73,6.5
+Levi,NC State,COLLEGE,ACC,10,74,6.5
+Shelby,Auburn,COLLEGE,SEC,10,75,7.5
+Chad,New Orleans Saints,NFL,NFC,10,76,5.5
+Kyle,Colorado,COLLEGE,Big 12,10,77,6.5
+Andrew,New York Giants,NFL,NFC,10,78,5.5
+Petty,Cleveland Browns,NFL,AFC,10,79,4.5
+Cliff,Michigan State,COLLEGE,Big Ten,10,80,5.5
