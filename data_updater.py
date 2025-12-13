@@ -142,12 +142,30 @@ def update_team_schedule(team, season_year):
             return
         
         # Get the team's full schedule for the season
-        params = {'season': season_year}
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        
-        events = data.get('events', [])
+        # For college football, we need to explicitly request each season type
+        # since ESPN only returns the current phase (postseason) by default during bowl season
+        all_events = []
+
+        if team.league == 'COLLEGE':
+            # Fetch regular season (seasontype=2) and postseason (seasontype=3) separately
+            for season_type in [2, 3]:
+                params = {'season': season_year, 'seasontype': season_type}
+                try:
+                    response = requests.get(url, params=params, timeout=10)
+                    response.raise_for_status()
+                    data = response.json()
+                    all_events.extend(data.get('events', []))
+                except requests.RequestException as e:
+                    print(f"    Warning: Failed to fetch seasontype={season_type}: {e}")
+        else:
+            # NFL API works fine without seasontype parameter
+            params = {'season': season_year}
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            all_events = data.get('events', [])
+
+        events = all_events
         if not events:
             print(f"    No games found for {team.name} in {season_year}")
             return
