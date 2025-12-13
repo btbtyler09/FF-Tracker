@@ -2,8 +2,13 @@ import requests
 from datetime import datetime, timedelta
 import json
 import time
+import threading
 from models import Team, Game
 from database import db
+
+# Lock to prevent concurrent update runs
+_update_lock = threading.Lock()
+_update_in_progress = False
 
 # Team name mapping for known mismatches between ESPN and our database
 TEAM_NAME_MAPPINGS = {
@@ -126,9 +131,17 @@ def update_game_results():
     """
     Main function to update all game results using team schedule API
     """
-    
+    global _update_in_progress
+
+    # Prevent concurrent updates
+    with _update_lock:
+        if _update_in_progress:
+            print("⏭️  Update already in progress, skipping...")
+            return
+        _update_in_progress = True
+
     print("Starting game results update...")
-    
+
     try:
         # Get current year
         current_year = datetime.now().year
@@ -147,11 +160,15 @@ def update_game_results():
         
         db.session.commit()
         print("Game results update completed successfully")
-        
+
     except Exception as e:
         db.session.rollback()
         print(f"Error updating game results: {e}")
         raise
+    finally:
+        # Always reset the flag when done
+        _update_in_progress = False
+
 
 def update_team_schedule(team, season_year):
     """
