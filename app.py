@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 import os
 import sys
+import threading
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -470,24 +471,24 @@ def initialize_app():
 
                 print("-" * 60)
 
-                # Perform automatic update on startup (skip in debug mode)
+                # Perform automatic update on startup in background thread
+                # This prevents Gunicorn worker timeout during the long update process
                 debug_mode = os.environ.get('DEBUG', 'False').lower() == 'true'
                 if not debug_mode:
-                    print("🔄 Running startup game data update...")
-                    try:
-                        update_game_results()
-                        print("✅ Game data update completed")
+                    def run_startup_update():
+                        """Run game data update in background thread"""
+                        try:
+                            with app.app_context():
+                                print("🔄 Background startup update started...")
+                                update_game_results()
+                                print("✅ Background startup update completed successfully")
+                        except Exception as e:
+                            print(f"❌ Warning: Background startup update failed: {e}")
 
-                        # Vegas line updates disabled - using projections directly
-                        # print("🎲 Running Vegas line updates...")
-                        # from vegas_updater import update_vegas_lines
-                        # vegas_result = update_vegas_lines()
-                        # print(f"✅ Vegas lines updated: {vegas_result['updated']} teams")
-
-                        print("✅ Startup data update completed successfully")
-                    except Exception as e:
-                        print(f"❌ Warning: Startup data update failed: {e}")
-                        # Don't crash the app if update fails
+                    print("🔄 Scheduling startup game data update (background thread)...")
+                    update_thread = threading.Thread(target=run_startup_update, daemon=True)
+                    update_thread.start()
+                    print("✅ Startup update thread launched")
                 else:
                     print("⏭️  Skipping startup update (debug mode)")
 
