@@ -92,6 +92,36 @@ def find_team_by_espn_data(teams, espn_team_name, espn_abbr, espn_id):
 NFL_TEAMS_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams"
 COLLEGE_TEAMS_URL = "https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams"
 
+# API request settings
+API_TIMEOUT = 15  # seconds
+API_RETRY_COUNT = 3
+API_RETRY_DELAY = 2  # seconds between retries
+API_REQUEST_DELAY = 0.5  # seconds between teams
+
+
+def fetch_with_retry(url, params, team_name=""):
+    """
+    Fetch URL with retry logic and proper error handling.
+    Returns the JSON data or None on failure.
+    """
+    for attempt in range(1, API_RETRY_COUNT + 1):
+        try:
+            response = requests.get(url, params=params, timeout=API_TIMEOUT)
+            response.raise_for_status()
+            return response.json()
+        except requests.Timeout:
+            print(f"    ⚠️  TIMEOUT (attempt {attempt}/{API_RETRY_COUNT}) fetching {team_name}: request exceeded {API_TIMEOUT}s")
+            if attempt < API_RETRY_COUNT:
+                time.sleep(API_RETRY_DELAY * attempt)  # Exponential backoff
+        except requests.RequestException as e:
+            print(f"    ⚠️  REQUEST ERROR (attempt {attempt}/{API_RETRY_COUNT}) fetching {team_name}: {e}")
+            if attempt < API_RETRY_COUNT:
+                time.sleep(API_RETRY_DELAY * attempt)
+
+    print(f"    ❌ FAILED to fetch {team_name} after {API_RETRY_COUNT} attempts")
+    return None
+
+
 def update_game_results():
     """
     Main function to update all game results using team schedule API
@@ -111,9 +141,9 @@ def update_game_results():
         for team in all_teams:
             print(f"  Updating {team.name} ({team.league})...")
             update_team_schedule(team, current_year)
-            
-            # Be nice to ESPN's API
-            time.sleep(0.3)
+
+            # Be nice to ESPN's API - longer delay to avoid rate limiting
+            time.sleep(API_REQUEST_DELAY)
         
         db.session.commit()
         print("Game results update completed successfully")
@@ -142,28 +172,18 @@ def update_team_schedule(team, season_year):
             return
         
         # Get the team's full schedule for the season
-        # For college football, we need to explicitly request each season type
-        # since ESPN only returns the current phase (postseason) by default during bowl season
+        # ESPN only returns the current phase by default, so we need to explicitly
+        # request both regular season (seasontype=2) and postseason (seasontype=3)
         all_events = []
 
-        if team.league == 'COLLEGE':
-            # Fetch regular season (seasontype=2) and postseason (seasontype=3) separately
-            for season_type in [2, 3]:
-                params = {'season': season_year, 'seasontype': season_type}
-                try:
-                    response = requests.get(url, params=params, timeout=10)
-                    response.raise_for_status()
-                    data = response.json()
-                    all_events.extend(data.get('events', []))
-                except requests.RequestException as e:
-                    print(f"    Warning: Failed to fetch seasontype={season_type}: {e}")
-        else:
-            # NFL API works fine without seasontype parameter
-            params = {'season': season_year}
-            response = requests.get(url, params=params, timeout=10)
-            response.raise_for_status()
-            data = response.json()
-            all_events = data.get('events', [])
+        # Fetch regular season (seasontype=2) and postseason (seasontype=3) separately
+        for season_type in [2, 3]:
+            params = {'season': season_year, 'seasontype': season_type}
+            data = fetch_with_retry(url, params, f"{team.name} seasontype={season_type}")
+            if data:
+                all_events.extend(data.get('events', []))
+            # Small delay between seasontype requests
+            time.sleep(0.2)
 
         events = all_events
         if not events:
@@ -268,11 +288,9 @@ def update_team_schedule(team, season_year):
             print(f"    Processed {games_processed} completed games, {wins_found} wins")
         else:
             print(f"    No completed games found for {team.name}")
-                        
-    except requests.RequestException as e:
-        print(f"    Error fetching schedule for {team.name}: {e}")
+
     except Exception as e:
-        print(f"    Error processing schedule for {team.name}: {e}")
+        print(f"    ❌ Error processing schedule for {team.name}: {e}")
 
 
 
