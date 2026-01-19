@@ -556,6 +556,13 @@ body {
     font-weight: 500;
 }
 
+.vegas-note {
+    color: var(--text-light);
+    font-size: 0.65rem;
+    font-style: italic;
+    margin-left: 4px;
+}
+
 /* Individual Vegas Lines */
 .vegas-line {
     display: flex;

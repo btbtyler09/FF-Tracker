@@ -4,116 +4,94 @@ from models import Manager, Team, Game
 def calculate_scores():
     """
     Calculate current standings based on league scoring rules:
-    - +1 point per regular season win
-    - +1 for winning conference championship (college)
-    - +1 for winning bowl game (college)  
-    - +1 for making playoffs (both)
-    - +1 per playoff win (both)
-    - +1 for championship win (both)
-    - +1 for exceeding preseason Vegas win total
+    - +1 point per win (any game type: regular, bowl, playoff, championship)
+    - +1 bonus for making playoffs (both college and NFL)
+    - +1 bonus for winning conference championship (college)
+    - +1 bonus for winning national championship (both)
+    - +1 bonus for exceeding preseason Vegas win total (regular season only)
     """
-    
+
     standings = []
-    
+
     try:
         for manager in Manager.query.order_by(Manager.draft_position).all():
             total_points = 0
             team_scores = []
             postseason_points = 0
-            
+
             for pick in manager.picks:
                 team = pick.team
                 points = 0
-                team_postseason = 0
-                
-                # Regular season wins (+1 each)
+                bonus_points = 0
+
+                # Count ALL wins (+1 each, regardless of game type)
+                all_wins = Game.query.filter_by(
+                    team_id=team.id,
+                    won=True
+                ).count()
+
+                all_losses = Game.query.filter_by(
+                    team_id=team.id,
+                    won=False
+                ).count()
+
+                # Regular season wins (for O/U calculation only)
                 regular_wins = Game.query.filter_by(
-                    team_id=team.id, 
+                    team_id=team.id,
                     game_type='regular',
                     won=True
                 ).count()
-                
-                # Calculate full record (wins, losses, ties)
-                total_regular_games = Game.query.filter_by(
-                    team_id=team.id,
-                    game_type='regular'
-                ).count()
-                regular_losses = Game.query.filter_by(
-                    team_id=team.id,
-                    game_type='regular',
-                    won=False
-                ).count()
-                regular_ties = total_regular_games - regular_wins - regular_losses
-                
-                points += regular_wins
-                
-                # Conference championship games (college only)
+
+                # All wins count as points
+                points += all_wins
+
+                # BONUS: Conference championship win (college only)
                 if team.league == 'COLLEGE':
-                    conf_champ_games = Game.query.filter_by(
+                    conf_champ_wins = Game.query.filter_by(
                         team_id=team.id,
-                        game_type='conference_championship'
-                    ).all()
-                    
-                    for game in conf_champ_games:
-                        if game.won:
-                            points += 1  # Win conference championship
-                            team_postseason += 1
-                
-                # Bowl games (college only) - separate from playoffs
-                if team.league == 'COLLEGE':
-                    bowl_games = Game.query.filter_by(
-                        team_id=team.id,
-                        game_type='bowl',
+                        game_type='conference_championship',
                         won=True
-                    ).all()
-                    
-                    for game in bowl_games:
-                        points += 1  # Win bowl game
-                        team_postseason += 1
-                
-                # Playoff participation and wins (both college and NFL)
+                    ).count()
+                    if conf_champ_wins > 0:
+                        bonus_points += 1  # Bonus for winning conf championship
+
+                # BONUS: Making playoffs (both college and NFL)
                 playoff_games = Game.query.filter_by(
                     team_id=team.id,
                     game_type='playoff'
-                ).all()
-                
-                if playoff_games:
-                    # +1 for making playoffs
-                    points += 1
-                    team_postseason += 1
-                    
-                    # +1 per playoff win
-                    playoff_wins = len([g for g in playoff_games if g.won])
-                    points += playoff_wins
-                    team_postseason += playoff_wins
-                
-                # Championship games
-                championship_games = Game.query.filter_by(
+                ).count()
+
+                if playoff_games > 0:
+                    bonus_points += 1  # Bonus for making playoffs
+
+                # BONUS: Championship win (both college and NFL)
+                championship_wins = Game.query.filter_by(
                     team_id=team.id,
                     game_type='championship',
                     won=True
-                ).all()
-                
-                for game in championship_games:
-                    points += 1  # Championship win
-                    team_postseason += 1
-                
-                # Vegas over/under bonus
+                ).count()
+
+                if championship_wins > 0:
+                    bonus_points += 1  # Bonus for winning championship
+
+                # BONUS: Vegas over/under (based on regular season wins only)
                 vegas_bonus = 0
                 if team.vegas_total and regular_wins > team.vegas_total:
                     vegas_bonus = 1
-                    points += vegas_bonus
-                
+                    bonus_points += vegas_bonus
+
+                points += bonus_points
+
                 team_scores.append({
                     'team_id': team.id,
                     'team_name': team.name,
                     'league': team.league,
                     'conference': team.conference or '',
-                    'regular_wins': regular_wins,
-                    'regular_losses': regular_losses,
-                    'regular_ties': regular_ties,
-                    'record': f"{regular_wins}-{regular_losses}-{regular_ties}",
-                    'postseason_points': team_postseason,
+                    'total_wins': all_wins,
+                    'total_losses': all_losses,
+                    'regular_wins': regular_wins,  # Keep for O/U display
+                    'record': f"{all_wins}-{all_losses}",
+                    'postseason_points': bonus_points,  # Now represents all bonus points
                     'vegas_bonus': vegas_bonus,
                     'vegas_total': team.vegas_total,
                     'total_points': points,
@@ -124,31 +102,18 @@ def calculate_scores():
                 })
                 
                 total_points += points
-                postseason_points += team_postseason
+                postseason_points += bonus_points
             
             # Sort teams by points (descending), then by pick order for tiebreaker
             team_scores.sort(key=lambda x: (-x['total_points'], x['pick_info']['pick']))
             
             # Calculate mobile-friendly breakdowns
-            total_wins = sum(team['regular_wins'] for team in team_scores)
-            total_bonus = sum(team['postseason_points'] + team['vegas_bonus'] for team in team_scores)
+            total_wins = sum(team['total_wins'] for team in team_scores)
+            total_losses = sum(team['total_losses'] for team in team_scores)
+            total_bonus = sum(team['postseason_points'] for team in team_scores)  # Already includes vegas_bonus
             preseason_projection = sum(team['vegas_total'] or 0 for team in team_scores)
-            
-            # Calculate manager's total record (W-L-T) across all teams
-            total_losses = 0
-            total_ties = 0
-            total_games = 0
-            for team_data in team_scores:
-                team = Team.query.get(team_data['team_id'])
-                if team:
-                    games_count = Game.query.filter_by(team_id=team.id, game_type='regular').count()
-                    losses_count = Game.query.filter_by(team_id=team.id, game_type='regular', won=False).count()
-                    ties_count = games_count - team_data['regular_wins'] - losses_count
-                    total_games += games_count
-                    total_losses += losses_count
-                    total_ties += ties_count
-            
-            manager_record = f"{total_wins}-{total_losses}-{total_ties}"
+
+            manager_record = f"{total_wins}-{total_losses}"
             
             standings.append({
                 'manager_name': manager.name,

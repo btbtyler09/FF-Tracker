@@ -74,26 +74,21 @@
                                         </div>
                                         <div class="team-stats">
                                             <div class="point-breakdown">
-                                                <span class="stat-wins">{{ team.regular_wins }}W</span>
+                                                <span class="stat-wins">{{ team.total_wins }}W</span>
                                                 <span class="stat-separator">|</span>
-                                                <span class="stat-bonus">{{ team.postseason_points + team.vegas_bonus }} Bonus</span>
+                                                <span class="stat-bonus">{{ team.postseason_points }} Bonus</span>
                                                 <span class="stat-separator">|</span>
                                                 <span class="stat-total">{{ team.total_points }} Total Pts</span>
                                             </div>
                                         </div>
                                         <div class="vegas-lines">
-                                            {% if team.original_vegas_line or team.vegas_line_used %}
+                                            {% if team.vegas_total %}
                                             <div class="vegas-progression">
                                                 <span class="vegas-label">O/U:</span>
-                                                {% if team.vegas_line_used and team.original_vegas_line and team.vegas_line_used != team.original_vegas_line %}
-                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.vegas_total) }}</span>
                                                 <span class="vegas-arrow">→</span>
-                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
-                                                {% elif team.vegas_line_used %}
-                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
-                                                {% elif team.original_vegas_line %}
-                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
-                                                {% endif %}
+                                                <span class="vegas-current">{{ team.regular_wins }}</span>
+                                                <span class="vegas-note">(regular season)</span>
                                             </div>
                                             {% endif %}
                                         </div>
@@ -102,7 +97,7 @@
                                 </div>
                             </div>
                             {% endif %}
-                            
+
                             <!-- NFL Teams Section -->
                             {% set nfl_teams = standing.teams|selectattr('league', 'equalto', 'NFL')|list %}
                             {% if nfl_teams %}
@@ -117,26 +112,21 @@
                                         </div>
                                         <div class="team-stats">
                                             <div class="point-breakdown">
-                                                <span class="stat-wins">{{ team.regular_wins }}W</span>
+                                                <span class="stat-wins">{{ team.total_wins }}W</span>
                                                 <span class="stat-separator">|</span>
-                                                <span class="stat-bonus">{{ team.postseason_points + team.vegas_bonus }} Bonus</span>
+                                                <span class="stat-bonus">{{ team.postseason_points }} Bonus</span>
                                                 <span class="stat-separator">|</span>
                                                 <span class="stat-total">{{ team.total_points }} Total Pts</span>
                                             </div>
                                         </div>
                                         <div class="vegas-lines">
-                                            {% if team.original_vegas_line or team.vegas_line_used %}
+                                            {% if team.vegas_total %}
                                             <div class="vegas-progression">
                                                 <span class="vegas-label">O/U:</span>
-                                                {% if team.vegas_line_used and team.original_vegas_line and team.vegas_line_used != team.original_vegas_line %}
-                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
+                                                <span class="vegas-preseason">{{ "%.1f"|format(team.vegas_total) }}</span>
                                                 <span class="vegas-arrow">→</span>
-                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
-                                                {% elif team.vegas_line_used %}
-                                                <span class="vegas-current">{{ "%.1f"|format(team.vegas_line_used) }}</span>
-                                                {% elif team.original_vegas_line %}
-                                                <span class="vegas-preseason">{{ "%.1f"|format(team.original_vegas_line) }}</span>
-                                                {% endif %}
+                                                <span class="vegas-current">{{ team.regular_wins }}</span>
+                                                <span class="vegas-note">(regular season)</span>
                                             </div>
                                             {% endif %}
                                         </div>
