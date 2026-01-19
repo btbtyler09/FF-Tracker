@@ -103,6 +103,82 @@ API_RETRY_COUNT = 3
 API_RETRY_DELAY = 2  # seconds between retries
 API_REQUEST_DELAY = 0.5  # seconds between teams
 
+# Postseason game type detection patterns
+# Conference championship patterns (college) - found in notes headline
+CONFERENCE_CHAMPIONSHIP_KEYWORDS = [
+    'SEC CHAMPIONSHIP',
+    'BIG TEN CHAMPIONSHIP',
+    'BIG 12 CHAMPIONSHIP',
+    'BIG XII CHAMPIONSHIP',
+    'ACC CHAMPIONSHIP',
+    'PAC-12 CHAMPIONSHIP',
+]
+
+
+def _get_event_note(event):
+    """Extract the headline note from an ESPN event's competitions."""
+    competitions = event.get('competitions', [])
+    if competitions:
+        notes = competitions[0].get('notes', [])
+        if notes:
+            return notes[0].get('headline', '')
+    return ''
+
+
+def determine_game_type(event, league):
+    """
+    Determine game type based on ESPN event data.
+
+    Uses the 'notes' field from competitions which contains:
+    - NFL: "AFC Wild Card", "Super Bowl LIX", etc.
+    - College: "SEC Championship", "College Football Playoff First Round",
+               "Tony the Tiger Sun Bowl", etc.
+
+    Args:
+        event: ESPN event dictionary
+        league: 'NFL' or 'COLLEGE'
+
+    Returns:
+        str: One of 'regular', 'conference_championship', 'bowl', 'playoff', 'championship'
+    """
+    season_type_id = event.get('seasonType', {}).get('id')
+
+    # Handle both string and int returns from ESPN
+    if isinstance(season_type_id, str):
+        season_type_id = int(season_type_id)
+
+    # Get the game note (contains bowl name, championship info, etc.)
+    note = _get_event_note(event).upper()
+
+    # Check for conference championships (appears in seasontype=2 for college)
+    if league == 'COLLEGE' and note:
+        for keyword in CONFERENCE_CHAMPIONSHIP_KEYWORDS:
+            if keyword in note:
+                return 'conference_championship'
+
+    # Preseason or regular season without special note
+    if season_type_id != 3:
+        return 'regular'
+
+    # --- POSTSEASON (seasontype=3) ---
+
+    if league == 'NFL':
+        if 'SUPER BOWL' in note:
+            return 'championship'
+        return 'playoff'  # All other NFL postseason = playoff
+
+    # COLLEGE postseason
+    # Check for CFP National Championship
+    if 'COLLEGE FOOTBALL PLAYOFF NATIONAL CHAMPIONSHIP' in note or 'CFP NATIONAL CHAMPIONSHIP' in note:
+        return 'championship'
+
+    # Check for CFP playoff games (First Round, Quarterfinal, Semifinal)
+    if 'COLLEGE FOOTBALL PLAYOFF' in note:
+        return 'playoff'
+
+    # Default: regular bowl game (non-CFP)
+    return 'bowl'
+
 
 def fetch_with_retry(url, params, team_name=""):
     """
@@ -269,31 +345,46 @@ def update_team_schedule(team, season_year):
                     days_since_start = (game_date - season_start).days
                     week = max(1, (days_since_start // 7) + 1)
                 
+                # Determine game type based on ESPN event data
+                game_type = determine_game_type(event, team.league)
+
                 # Check if this game already exists in our database
                 existing_game = Game.query.filter_by(
                     team_id=team.id,
                     espn_game_id=event.get('id')
                 ).first()
-                
+
                 if existing_game:
-                    # Update existing game if result changed
-                    if (existing_game.won != won or 
-                        existing_game.score_us != our_score or 
-                        existing_game.score_them != their_score):
-                        print(f"    Updated: {team.name} vs {opponent_name}: {int(our_score)}-{int(their_score)} ({'W' if won else 'L'})")
+                    # Update existing game if result or game_type changed
+                    needs_update = (
+                        existing_game.won != won or
+                        existing_game.score_us != our_score or
+                        existing_game.score_them != their_score or
+                        existing_game.game_type != game_type
+                    )
+                    if needs_update:
+                        # Log game type reclassification
+                        if existing_game.game_type != game_type:
+                            print(f"    📌 Reclassified to {game_type.upper()}: {team.name} vs {opponent_name}")
+                        else:
+                            print(f"    Updated: {team.name} vs {opponent_name}: {int(our_score)}-{int(their_score)} ({'W' if won else 'L'})")
                         existing_game.won = won
                         existing_game.score_us = our_score
                         existing_game.score_them = their_score
+                        existing_game.game_type = game_type
                         existing_game.updated_at = datetime.utcnow()
                 else:
                     # Create new game record
-                    print(f"    Added: {team.name} vs {opponent_name}: {int(our_score)}-{int(their_score)} ({'W' if won else 'L'})")
+                    if game_type != 'regular':
+                        print(f"    📌 {game_type.upper()}: {team.name} vs {opponent_name}: {int(our_score)}-{int(their_score)} ({'W' if won else 'L'})")
+                    else:
+                        print(f"    Added: {team.name} vs {opponent_name}: {int(our_score)}-{int(their_score)} ({'W' if won else 'L'})")
                     game = Game(
                         team_id=team.id,
                         week=week,
                         opponent=opponent_name,
                         won=won,
-                        game_type='regular',
+                        game_type=game_type,
                         game_date=game_date,
                         score_us=our_score,
                         score_them=their_score,
