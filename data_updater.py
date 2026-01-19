@@ -219,9 +219,10 @@ def update_game_results():
     print("Starting game results update...")
 
     try:
-        # Get current year
-        current_year = datetime.now().year
-        print(f"Updating games for {current_year} season")
+        # Get season year from config (not current year - season spans Aug-Feb)
+        from config import Config
+        season_year = Config.SEASON_YEAR
+        print(f"Updating games for {season_year} season")
         
         # Get all teams and update each one
         all_teams = Team.query.all()
@@ -229,7 +230,7 @@ def update_game_results():
         
         for team in all_teams:
             print(f"  Updating {team.name} ({team.league})...")
-            update_team_schedule(team, current_year)
+            update_team_schedule(team, season_year)
 
             # Be nice to ESPN's API - longer delay to avoid rate limiting
             time.sleep(API_REQUEST_DELAY)
